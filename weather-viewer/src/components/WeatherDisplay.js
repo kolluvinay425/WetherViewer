@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
+import { getTemperatureIcon } from "../helpers";
 const WeatherContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -57,21 +57,23 @@ const AddButton = styled.button`
   }
 `;
 
-export const getWeatherIcon = (temperature) => {
-  if (temperature > 30) {
-    return "https://cdn-icons-png.flaticon.com/512/7084/7084512.png";
-  } else if (temperature > 20) {
-    return "https://cdn2.iconfinder.com/data/icons/weather-flat-14/64/weather02-512.png";
-  } else if (temperature > 10) {
-    return "https://img.freepik.com/premium-vector/3d-weather-forecast-icons-summer-sun-with-bright-sunlight-hot-weather-3d-illustration_68708-3829.jpg";
-  } else {
-    return "https://w7.pngwing.com/pngs/212/586/png-transparent-weather-clouds-snow-winter-weather-color-icon.png";
-  }
-};
+// export const getWeatherIcon = (temperature) => {
+//   if (temperature > 30) {
+//     return "https://cdn-icons-png.flaticon.com/512/7084/7084512.png";
+//   } else if (temperature > 20) {
+//     return "https://cdn2.iconfinder.com/data/icons/weather-flat-14/64/weather02-512.png";
+//   } else if (temperature > 10) {
+//     return "https://img.freepik.com/premium-vector/3d-weather-forecast-icons-summer-sun-with-bright-sunlight-hot-weather-3d-illustration_68708-3829.jpg";
+//   } else {
+//     return "https://w7.pngwing.com/pngs/212/586/png-transparent-weather-clouds-snow-winter-weather-color-icon.png";
+//   }
+// };
+
+// const getWeatherIcon = getTemperatureIcon(temperature);
 
 const WeatherDisplay = ({ weather, addFavorite }) => {
   const { temperature, weatherConditions, humidity, windSpeed, city } = weather;
-  const weatherIcon = getWeatherIcon(temperature);
+  const weatherIcon = getTemperatureIcon(temperature);
 
   return (
     <div>
@@ -82,16 +84,13 @@ const WeatherDisplay = ({ weather, addFavorite }) => {
           <WeatherInfo>{temperature}°C</WeatherInfo>
           <WeatherInfo> {weatherConditions}</WeatherInfo>
         </Card>
-        {/* <Card>
-          <WeatherIcon src={weatherIcon} alt="Weather icon" />
-          <WeatherInfo> {weatherConditions}</WeatherInfo>
-        </Card> */}
+
         <Card>
           <WeatherIcon
             src={"https://cdn-icons-png.flaticon.com/512/4888/4888486.png"}
             alt="Weather icon"
           />
-          <WeatherInfo>Humidity: {humidity}%</WeatherInfo>
+          <WeatherInfo>Humidity: {humidity} %</WeatherInfo>
         </Card>
         <Card>
           <WeatherIcon
@@ -100,7 +99,7 @@ const WeatherDisplay = ({ weather, addFavorite }) => {
             }
             alt="Weather icon"
           />
-          <WeatherInfo>Wind Speed: {windSpeed} m/s</WeatherInfo>
+          <WeatherInfo>Wind Speed: {windSpeed} km/h</WeatherInfo>
         </Card>
       </WeatherContainer>
       <div style={{ textAlign: "center", marginTop: "20px" }}>

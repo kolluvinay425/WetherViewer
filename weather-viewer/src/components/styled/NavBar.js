@@ -23,10 +23,10 @@ const LogoIcon = styled.img`
   margin-right: 10px;
 `;
 
-const Navbar = () => {
+const Navbar = ({ reset }) => {
   return (
     <NavbarContainer>
-      <Logo>
+      <Logo onClick={reset}>
         <LogoIcon
           src="https://cdn-icons-png.flaticon.com/512/9393/9393425.png"
           alt="Weather Logo"

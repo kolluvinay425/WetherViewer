@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getWeatherIcon } from "./WeatherDisplay";
+import { getTemperatureIcon } from "../helpers";
+import { fetchHourlyWeatherData } from "../helpers/Api";
 
 // Styled components
 const FavoritesContainer = styled.div`
@@ -24,6 +25,7 @@ const FavoriteList = styled.ul`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 0;
 `;
 
 const FavoriteItem = styled.li`
@@ -33,7 +35,7 @@ const FavoriteItem = styled.li`
   border-radius: 10px;
   margin: 10px;
   padding: 15px;
-  width: 30%;
+  width: 80%;
   text-align: left;
   transition: all 0.3s ease-in-out;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
@@ -41,17 +43,19 @@ const FavoriteItem = styled.li`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  @media (min-width: 768px) {
+    width: 60%;
+  }
+
+  @media (min-width: 1024px) {
+    width: 40%;
+  }
+
   &:hover {
     background-color: #0056b3;
     transform: scale(1.01);
   }
-`;
-
-const CollapsibleContent = styled.div`
-  display: ${({ isCollapsed }) => (isCollapsed ? "none" : "flex")};
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
 `;
 
 const WeatherIcon = styled.img`
@@ -83,16 +87,44 @@ const RemoveButton = styled.button`
   }
 `;
 
+const SortButton = styled.button`
+  background-color: #007bff;
+  width: 32%;
+  color: white;
+  border: none;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 15px;
+  cursor: pointer;
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
 // Favorites component
 const Favorites = ({ favorites, removeFavorite, showWeather }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isSorted, setIsSorted] = useState(false);
+  const [cityFavorites, setCityFavorites] = useState([...favorites]);
+
+  useEffect(() => {
+    setCityFavorites([...favorites]);
+  }, [favorites]);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
 
   const weatherIconFun = (temperature) => {
-    return getWeatherIcon(temperature);
+    return getTemperatureIcon(temperature);
+  };
+
+  const sortFavoritesByTemperature = () => {
+    const sorted = !isSorted
+      ? [...cityFavorites].sort((a, b) => a.temperature - b.temperature)
+      : [...favorites];
+    setCityFavorites(sorted);
+    setIsSorted(!isSorted);
   };
 
   return (
@@ -100,9 +132,14 @@ const Favorites = ({ favorites, removeFavorite, showWeather }) => {
       <FavoriteHeader onClick={toggleCollapse}>
         {isCollapsed ? "Show Favorites" : "Hide Favorites"}
       </FavoriteHeader>
+      {!isCollapsed && cityFavorites.length > 1 && (
+        <SortButton onClick={sortFavoritesByTemperature}>
+          {isSorted ? "Revert Back" : "Sort by Temperature"}
+        </SortButton>
+      )}
       {!isCollapsed && (
         <FavoriteList>
-          {favorites.map((weather, index) => (
+          {cityFavorites.map((weather, index) => (
             <FavoriteItem key={index} onClick={() => showWeather(weather.city)}>
               <WeatherInfo>
                 <span>{weather.city}</span>
@@ -111,15 +148,19 @@ const Favorites = ({ favorites, removeFavorite, showWeather }) => {
                     src={weatherIconFun(weather.temperature)}
                     alt="Weather icon"
                   />
-                  <span>{weather.temperature} °C</span>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ paddingBottom: "2px" }}>
+                      {weather.temperature} °C
+                    </span>
+                    <span>{weather.weatherConditions}</span>
+                  </div>
                 </div>
-                {/* <WeatherDetails> */}
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <WeatherIcon
                     src={
                       "https://i.pinimg.com/originals/45/69/9b/45699b2e23cd8359b99430fac758e2ad.png"
                     }
-                    alt="wind speed icon"
+                    alt="Wind speed icon"
                   />
                   <span>{weather.windSpeed} m/s</span>
                 </div>
@@ -128,12 +169,10 @@ const Favorites = ({ favorites, removeFavorite, showWeather }) => {
                     src={
                       "https://cdn-icons-png.flaticon.com/512/4888/4888486.png"
                     }
-                    alt="wind speed icon"
+                    alt="Humidity icon"
                   />
                   <span>{weather.humidity} %</span>
                 </div>
-
-                {/* </WeatherDetails> */}
                 <RemoveButton
                   onClick={(e) => {
                     e.stopPropagation();

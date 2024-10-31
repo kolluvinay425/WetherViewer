@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -32,43 +31,7 @@ const GraphContainer = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const TemperatureTrend = ({ city }) => {
-  const [hourlyTemperatures, setHourlyTemperatures] = useState([]);
-  const [weatherData, setWeatherData] = useState(null);
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const geocodeResponse = await axios.get(
-          `https://nominatim.openstreetmap.org/search`,
-          {
-            params: { city, format: "json", limit: 1 },
-          }
-        );
-        const { lat, lon } = geocodeResponse.data[0];
-        const weatherResponse = await axios.get(
-          "https://api.open-meteo.com/v1/forecast",
-          {
-            params: {
-              latitude: lat,
-              longitude: lon,
-              hourly: "temperature_2m",
-              start: new Date().toISOString().split("T")[0],
-              end: new Date().toISOString().split("T")[0],
-            },
-          }
-        );
-
-        setHourlyTemperatures(weatherResponse.data.hourly.temperature_2m);
-        setWeatherData(city);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchWeather();
-  }, [city]);
-
+const TemperatureTrend = ({ city, hourlyTemperatures }) => {
   const getTimeLabels = () => {
     const labels = [];
     const currentHour = new Date().getHours();
